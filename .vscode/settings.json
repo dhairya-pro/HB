@@ -1,0 +1,23 @@
+{
+    "cSpell.words": [
+        "addappointment",
+        "axiosinstance",
+        "bloodbank",
+        "dlogin",
+        "Doctordashboard",
+        "Doctorlogin",
+        "doctorname",
+        "doctorroutes",
+        "Doctorsignup",
+        "dsignup",
+        "getdoctors",
+        "Patientdashboard",
+        "Patientlogin",
+        "patientname",
+        "patientroutes",
+        "Patientsignup",
+        "pdashboard",
+        "plogin",
+        "psignup"
+    ]
+}
