@@ -49,24 +49,35 @@ function Voicebasedassistant() {
   const sendAudioToBackend = async (audioBlob) => {
     const formData = new FormData();
     formData.append("audio", audioBlob, "audio.wav");
-
+  
     setLoading(true); // Show loading indicator
-
+  
     try {
       const response = await axiosInstance.post("/patient/speech-to-text", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+  
       const cleanedTranscript = response.data.transcript.replace(/<think>.*?<\/think>/gs, "").trim();
-      const cleanedAiResponse = response.data.response.replace(/<think>.*?<\/think>/gs, "").trim();
-
+      
+      let cleanedAiResponse = response.data.response.replace(/<think>.*?<\/think>/gs, "").trim();
+  
+      // Convert response into point-wise format
+      const formattedResponse = cleanedAiResponse
+        .split("\n") // Split by line breaks
+        .filter(line => line.trim() !== "") // Remove empty lines
+        .map((line, index) => `${index + 1}. ${line.trim()}`) // Add numbering
+        .join("\n");
+  
       setTranscript(cleanedTranscript);
-      setAiResponse(cleanedAiResponse);
+      setAiResponse(formattedResponse);
     } catch (error) {
       console.error("Error sending audio:", error);
+      setAiResponse("❌ Unable to process request. Please try again.");
     } finally {
       setLoading(false); // Hide loading indicator
     }
   };
+  
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>

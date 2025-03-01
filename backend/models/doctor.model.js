@@ -23,7 +23,8 @@ const doctorSchema = new mongoose.Schema({
     ],
    appointments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Appointment" }],
     createdAt: { type: Date, default: Date.now },
-    role: { type: String, default: "doctor" }
+    role: { type: String, default: "doctor" },
+
 });
 
 

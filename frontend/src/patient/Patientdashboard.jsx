@@ -1,6 +1,4 @@
-
 /* eslint-disable react/prop-types */
-
 import React, { useState,useEffect } from "react";
 import { useAuth } from "../components/AuthContext.jsx";
 import { useNavigate } from 'react-router-dom';
@@ -14,8 +12,9 @@ import DocumentAnalyzer from "../components/DocumentAnalyzer.jsx";
 import Voicebasedassistant from "../components/Voicebasedassistant.jsx";
 import AshaAI from "../components/AshaAi.jsx";
 import {useLanguage } from "../../LanguageContext.jsx";
-
+import { FaUser, FaCalendarAlt, FaHospital, FaFileMedical, FaHeartbeat, FaSignOutAlt, FaMicrophone, FaFileAlt } from "react-icons/fa";
 const Profile = () => <div className="p-6"><h2 className="text-2xl font-bold mb-4">Profile</h2><p>Your profile information will appear here.</p></div>;
+
 
 const translations = {
   en: {
@@ -114,6 +113,8 @@ const MedicalHistory = () => {
       </div>
   );
 };
+
+
 const Appointments = () => {
   const { user } = useAuth();
   const [appointments, setAppointments] = useState([]);
@@ -122,103 +123,66 @@ const Appointments = () => {
   const [showBookingForm, setShowBookingForm] = useState(false);
   const { language } = useLanguage();
 
-  // Translation function
-  const translate = (text) => {
-    const translations = {
-      en: {
-        title: "Your Appointments",
-        book: "Book Appointment",
-        noAppointments: "You don't have any appointments scheduled.",
-        doctor: "Doctor",
-        date: "Date",
-        time: "Time",
-        status: "Status",
-        actions: "Actions",
-        details: "Details",
-        cancel: "Cancel",
-        bookNew: "Book New Appointment",
-      },
-      hi: {
-        title: "आपकी नियुक्तियां",
-        book: "नियुक्ति बुक करें",
-        noAppointments: "आपकी कोई नियुक्ति निर्धारित नहीं है।",
-        doctor: "डॉक्टर",
-        date: "तारीख",
-        time: "समय",
-        status: "स्थिति",
-        actions: "कार्य",
-        details: "विवरण",
-        cancel: "रद्द करें",
-        bookNew: "नई नियुक्ति बुक करें",
-      },
-      gu: {
-        title: "તમારી મુલાકાતો",
-        book: "મુલાકાત બુક કરો",
-        noAppointments: "તમારી કોઈ મુલાકાત નિર્ધારિત નથી.",
-        doctor: "ડૉક્ટર",
-        date: "તારીખ",
-        time: "સમય",
-        status: "સ્થિતિ",
-        actions: "ક્રિયાઓ",
-        details: "વિગતો",
-        cancel: "રદ કરો",
-        bookNew: "નવી મુલાકાત બુક કરો",
-      },
-    };
-    return translations[language]?.[text] || text;
-  };
-
   useEffect(() => {
-    const fetchAppointments = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axiosInstance.post("/patient/get/appointments", {
-          patientId: user?.patient?.patientId,
-        });
-
-        if (!response || response.status !== 200) {
-          throw new Error("Error fetching appointments");
-        }
-
-        setAppointments(response.data || []);
-      } catch (err) {
-        setError("Failed to load your appointments. Please try again later.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     if (user?.patient?.patientId) {
       fetchAppointments();
     }
   }, [user]);
 
-  if (isLoading) {
-    return <div className="flex justify-center items-center h-64">Loading...</div>;
-  }
+  const fetchAppointments = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axiosInstance.post("/patient/get/appointments", {
+        patientId: user?.patient?.patientId,
+      });
+
+      if (!response || response.status !== 200) {
+        throw new Error("Error fetching appointments");
+      }
+
+      setAppointments(response.data || []);
+    } catch (err) {
+      setError("Failed to load your appointments. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle successful booking and refresh the appointments
+  const handleBookingSuccess = () => {
+    setShowBookingForm(false);
+    fetchAppointments(); // Refresh appointments after booking
+  };
 
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">{translate("title")}</h2>
+        <h2 className="text-2xl font-bold">Your Appointments</h2>
         <button onClick={() => setShowBookingForm(true)} className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md">
-          + {translate("book")}
+          + Book Appointment
         </button>
       </div>
+
+      {/* Show BookAppointment Component */}
+      {showBookingForm && (
+        <div className="p-4 bg-white rounded-lg shadow-md">
+          <BookAppointment onBookingSuccess={handleBookingSuccess} onCancel={() => setShowBookingForm(false)} />
+        </div>
+      )}
 
       {error ? (
         <div className="p-4 text-red-700 bg-red-100 rounded-md">{error}</div>
       ) : appointments.length === 0 ? (
-        <div className="text-center p-8 bg-gray-50 rounded-md">{translate("noAppointments")}</div>
+        <div className="text-center p-8 bg-gray-50 rounded-md">You don't have any appointments scheduled.</div>
       ) : (
         <table className="min-w-full bg-white rounded-lg overflow-hidden shadow-md">
           <thead className="bg-gray-100 text-gray-700">
             <tr>
-              <th className="py-3 px-4 text-left">{translate("doctor")}</th>
-              <th className="py-3 px-4 text-left">{translate("date")}</th>
-              <th className="py-3 px-4 text-left">{translate("time")}</th>
-              <th className="py-3 px-4 text-left">{translate("status")}</th>
-              <th className="py-3 px-4 text-left">{translate("actions")}</th>
+              <th className="py-3 px-4 text-left">Doctor</th>
+              <th className="py-3 px-4 text-left">Date</th>
+              <th className="py-3 px-4 text-left">Time</th>
+              <th className="py-3 px-4 text-left">Status</th>
+              <th className="py-3 px-4 text-left">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -229,9 +193,9 @@ const Appointments = () => {
                 <td className="py-3 px-4">{appointment.time}</td>
                 <td className="py-3 px-4">{appointment.status}</td>
                 <td className="py-3 px-4">
-                  <button className="text-blue-600 hover:text-blue-800">{translate("details")}</button>
+                  <button className="text-blue-600 hover:text-blue-800">Details</button>
                   {appointment.status !== "Cancelled" && (
-                    <button className="ml-2 text-red-600 hover:text-red-800">{translate("cancel")}</button>
+                    <button className="ml-2 text-red-600 hover:text-red-800">Cancel</button>
                   )}
                 </td>
               </tr>
@@ -239,21 +203,13 @@ const Appointments = () => {
           </tbody>
         </table>
       )}
-
-      {showBookingForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-4 max-w-xl w-full">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold">{translate("bookNew")}</h3>
-              <button onClick={() => setShowBookingForm(false)} className="text-gray-500 hover:text-gray-700">✕</button>
-            </div>
-            <BookAppointment />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
+
+
+
+
 
 
 
@@ -263,7 +219,6 @@ const Appointments = () => {
 const PatientDashboard = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-
   const [activeTab, setActiveTab] = useState("appointments");
 
   if (!user) {
@@ -272,83 +227,75 @@ const PatientDashboard = () => {
     return null;
   }
 
+  const tabs = [
+    { id: "profile", label: "Profile", icon: <FaUser /> },
+    { id: "appointments", label: "Appointments", icon: <FaCalendarAlt /> },
+    { id: "medicalHistory", label: "Medical History", icon: <FaFileMedical /> },
+    { id: "healthcentres", label: "Health Centres", icon: <FaHospital /> },
+    { id: "bloodbank", label: "Blood Banks", icon: <FaHeartbeat /> },
+    { id: "NeedBlood", label: "Need Blood", icon: <FaHeartbeat /> },
+    { id: "DocumentAnalyser", label: "Document Analyzer", icon: <FaFileAlt /> },
+    { id: "VoiceAssistant", label: "Voice Assistant", icon: <FaMicrophone /> },
+    { id: "AshaAI", label: "AshaAI", icon: <FaMicrophone /> },
+  ];
+
   const renderComponent = () => {
     switch (activeTab) {
-      case "profile":
-        return <Profile />;
-      case "appointments":
-        return <Appointments />;
-      case "medicalHistory":
-        return <MedicalHistory user={user} />;
-      case "healthcentres":
-        return <Healthcentres />;
-      case "bloodbank":
-        return <BloodBank />;
-      case "NeedBlood":
-        return <NeedBlood />;
-      case "Document analyser":
-        return <DocumentAnalyzer />;
-      case "Voicebasedassistant":
-        return <Voicebasedassistant />;
-      case "AshaAI":
-        return <AshaAI />;
-      default:
-        return <Profile />;
+      case "profile": return <Profile />;
+      case "appointments": return <Appointments />;
+      case "medicalHistory": return <MedicalHistory user={user} />;
+      case "healthcentres": return <Healthcentres />;
+      case "bloodbank": return <BloodBank />;
+      case "NeedBlood": return <NeedBlood />;
+      case "DocumentAnalyser": return <DocumentAnalyzer />;
+      case "VoiceAssistant": return <Voicebasedassistant />;
+      case "AshaAI": return <AshaAI />;
+      default: return <Profile />;
     }
   };
 
-  const NavItem = ({ id, label, icon }) => (
-    <button
-      onClick={() => setActiveTab(id)}
-      className={`px-4 py-2 rounded-md transition-colors ${
-        activeTab === id
-          ? "bg-blue-600 text-white font-semibold"
-          : "text-gray-700 hover:bg-gray-100"
-      }`}
-    >
-      {icon && <span className="mr-2">{icon}</span>}
-      {label}
-    </button>
-  );
-
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      {/* Top Navigation Bar */}
-      <div className="bg-white shadow-md p-4 flex items-center justify-between border-b">
-        <div>
-          <h1 className="text-xl font-bold">Patient Portal</h1>
-          <p className="text-sm text-gray-600">Welcome, {user.patient.name}</p>
-        </div>
-        <nav className="flex space-x-4">
-          <NavItem id="profile" label="Profile" icon="👤" />
-          <NavItem id="appointments" label="Appointments" icon="📅" />
-          <NavItem id="medicalHistory" label="Medical History" icon="📋" />
-          <NavItem id="healthcentres" label="Health Centres" icon="🏥" />
-          <NavItem id="bloodbank" label="Blood Banks" icon="💉" />
-          <NavItem id="NeedBlood" label="Need Blood" icon="💉" />
-          <NavItem id="Document analyser" label="Document Analyser" />
-          <NavItem id="Voicebasedassistant" label="Voice Assistant" />
-          <NavItem id="AshaAI" label="AshaAI" />
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <aside className="w-64 bg-[#D1E5E4] text-black flex flex-col p-6 space-y-4 shadow-lg">
+        <h1 className="text-2xl font-bold">Patient Portal</h1>
+        <p className="text-sm opacity-80">Welcome, {user.patient.name}</p>
+        <nav className="flex-grow space-y-2">
+          {tabs.map(({ id, label, icon }) => (
+            <button
+              key={id}
+              onClick={() => setActiveTab(id)}
+              className={`w-full flex items-center p-3 rounded-lg transition-all ${
+                activeTab === id ? "bg-[#42aea9]" : ""
+              }`}
+            >
+              <span className="mr-3">{icon}</span>
+              {label}
+            </button>
+          ))}
         </nav>
-        <button
-          onClick={logout}
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors"
-        >
-          Logout
+        <button onClick={logout} className="flex items-center p-3 rounded-lg border-x-24 ">
+          <FaSignOutAlt className="mr-2" /> Logout
         </button>
-      </div>
+      </aside>
 
       {/* Main Content */}
-      <div className="flex-grow overflow-auto">
-        <div className="p-6 bg-white shadow-sm border-b">
+      <main className="flex-grow flex flex-col">
+        {/* Header */}
+        <div className="bg-white p-6 shadow-md">
           <h2 className="text-2xl font-bold capitalize">{activeTab.replace(/([A-Z])/g, " $1")}</h2>
         </div>
-        <main className="p-6">{renderComponent()}</main>
-      </div>
+        {/* Content Area */}
+        <div className="p-6 flex-grow bg-white shadow-md m-4 rounded-lg overflow-auto">
+          {renderComponent()}
+        </div>
+      </main>
     </div>
   );
 };
 
 export default PatientDashboard;
+
+
 
 

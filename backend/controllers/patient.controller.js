@@ -412,23 +412,30 @@ export const processText = async (req, res) => {
 };
 
 
-
 export const medicalresponse = async (req, res) => {
-    const { medicalText } = req.body;
+    const { medicalText, language } = req.body;
     
     if (!medicalText) {
         return res.status(400).json({ reply: "Error: medical text required" });
     }
+    
+    if (!language) {
+        return res.status(400).json({ reply: "Error: language parameter required" });
+    }
+    
+    const prompt = `Provide a medical analysis based on the following data in ${language}:
 
-    const prompt = `Provide a medical analysis based on the following data:\n\n"${medicalText}"\n\nRespond in a professional medical tone.`;
+"${medicalText}"
 
+Respond in a professional medical tone using the requested language.`;
+    
     try {
         const groqResponse = await groq.chat.completions.create({
             model: "deepseek-r1-distill-llama-70b",
             messages: [
                 {
                     role: "system",
-                    content: `You are an AI health assistant. You should only reply to medical-related text. If the text is not related to medical information, respond with "Not Found."`,
+                    content: `You are an AI health assistant. You should only reply to medical-related text. If the text is not related to medical information, respond with "Not Found." Ensure your response is in the requested language: ${language}.`,
                 },
                 {
                     role: "user",
@@ -436,7 +443,7 @@ export const medicalresponse = async (req, res) => {
                 },
             ],
         });
-
+        
         const Reply = groqResponse.choices?.[0]?.message?.content || "No response";
         res.json({ reply: Reply });
     } catch (error) {

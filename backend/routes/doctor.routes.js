@@ -15,5 +15,5 @@ router.get("/dashboard", verifyToken, doctorOnly, getDoctorDashboard);
 router.get("/getdoctors",verifyToken, doctorController.getDoctors);
 router.get("/getappointments",verifyToken, appointment.getAppointmentsbydoctorid);
 router.put("/updateStatus",verifyToken, appointment.updateStatus);
-
+router.post("/savePrescription",verifyToken,doctorController.Prescriptionadd)
 export default router;
