@@ -2,6 +2,7 @@ import Doctor from "../models/doctor.model.js";
 import { sendEmail } from '../services/email.services.js';
 import Appointment from "../models/appoinment.model.js";
 import Prescription from "../models/prescription.model.js";
+import { createGoogleMeetEvent } from "../utils/scheduler.js";
 import mongoose from "mongoose";
 // ✅ Doctor Signup Controller
 export const doctorSignup = async (req, res) => {
@@ -114,7 +115,7 @@ export const getDoctorDashboard = async (req, res) => {
 
 export const getDoctors = async (req, res) => {
     try {
-        const doctors = await Doctor.find({ role: "doctor" });
+        const doctors = await Doctor.find({  });
         if (!doctors) {
             return res.status(404).json({ message: "No doctors found!" });
         }
@@ -148,4 +149,37 @@ export const Prescriptionadd = async (req, res) => {
     }
 };
 
+export const meetingScheduler  = async (req,res) => {
+    const { appointmentId } = req.body;
 
+    try {
+        console.log(appointmentId)
+        const appointment = await Appointment.findOne({appointmentId});
+        if (!appointment) return res.status(404).json({ message: "Appointment not found" });
+
+        const { doctorEmail, patientEmail, date, time } = appointment;
+        const meetLink = await createGoogleMeetEvent(doctorEmail, patientEmail, date, time);
+
+        // Update DB with Meet link
+        appointment.meetLink = meetLink;
+        await appointment.save();
+
+        // Send email to doctor and patient
+        await sendEmail(
+            doctorEmail,
+            "Join meeting for your online consultation",
+            `this is your meeting ID join at your time slot ${meetLink}`
+        );
+        await sendEmail(
+            patientEmail,
+            "Join meeting for your online consultation",
+            `this is your meeting ID join at selected time slot ${meetLink}`
+        );
+       
+
+        res.json({ message: "Meeting scheduled successfully!", meetLink });
+    } catch (error) {
+        console.log("error is:",error)
+        res.status(500).json({ message: "Error scheduling meeting", error });
+    }
+}

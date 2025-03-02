@@ -57,7 +57,7 @@ export default function Healthcentres() {
             {/* Search Button */}
             <button
                 onClick={fetchPlaces}
-                className="w-full mt-4 bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition"
+                className="w-full mt-4 bg-teal-500 text-white p-3 rounded-md hover:bg-blue-700 transition"
                 disabled={loading}
             >
                 {loading ? "Searching..." : "Find Now"}

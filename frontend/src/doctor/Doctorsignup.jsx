@@ -165,10 +165,10 @@ const Doctorsignup = () => {
   const timeOptions = generateTimeOptions();
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl mb-8">
+    <div className="min-h-screen bg-teal-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl ">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-800">Doctor Registration</h1>
+          <h1 className="text-4xl font-bold text-teal-500">Doctor Registration</h1>
           <p className="text-gray-600 mt-2">Join our medical platform to connect with patients</p>
         </div>
         
@@ -316,7 +316,7 @@ const Doctorsignup = () => {
               <button
                 type="button"
                 onClick={addTimingSlot}
-                className="bg-blue-500 hover:bg-blue-600 text-white text-sm py-1 px-3 rounded-lg transition duration-300"
+                className="bg-teal-500 hover:bg-teal-500 text-white text-sm py-1 px-3 rounded-lg transition duration-300"
               >
                 + Add Slot
               </button>
@@ -395,7 +395,7 @@ const Doctorsignup = () => {
             className={`w-full font-medium py-2 px-4 rounded-lg transition duration-300 mt-4 ${
               isRedirecting 
                 ? 'bg-green-500 hover:bg-green-600 text-white cursor-not-allowed' 
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
+                : 'bg-teal-500 hover:bg-teal-500 text-white'
             }`}
             disabled={isRedirecting}
           >
@@ -406,7 +406,7 @@ const Doctorsignup = () => {
         <div className="text-center pt-4 mt-4 border-t border-gray-200">
           <p className="text-gray-600">
             Already have an account?{' '}
-            <Link to="/dlogin" className="text-blue-500 hover:text-blue-700 font-medium">
+            <Link to="/dlogin" className="text-teal-500 font-medium">
               Log In
             </Link>
           </p>

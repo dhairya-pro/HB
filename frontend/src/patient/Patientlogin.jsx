@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "../../LanguageContext";
 import { axiosInstance } from "../axiosinstance";
 import { useAuth } from "../components/AuthContext";
-
+import logo from "../assets/healthbridgelogo.png"
 const translations = {
   en: {
     welcomeText: "Welcome to HealthBridge!",
@@ -59,7 +59,7 @@ const PatientLogin = () => {
       if (response.status === 200) {
         login(response.data);
         console.log(response.data);
-        navigate("/pdashboard");
+        navigate("/homepage");
       } else {
         setError(t.error);
       }
@@ -74,8 +74,9 @@ const PatientLogin = () => {
 
   return (
     <div className="flex min-h-screen bg-teal-50">
+    
       {/* Left side with logo */}
-      <div className="relative flex flex-col items-center justify-center w-1/2 p-8">
+      <div className="relative flex flex-col items-center justify-center w-1/2 p-8 bg-white">
         <button 
           onClick={handleBack} 
           className="absolute top-8 left-8 flex items-center text-gray-500 hover:text-teal-600"
@@ -83,21 +84,17 @@ const PatientLogin = () => {
           <span>← {t.back}</span>
         </button>
         
-        <div className="mb-4 w-48">
+        <div className="mb-4 w-84">
           <img 
-            src="/api/placeholder/200/200" 
+            src={logo}
             alt="HealthBridge Logo" 
             className="w-full"
           />
         </div>
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800">HEALTHBRIDGE</h2>
-          <p className="text-sm text-gray-500">HEALTHCARE SOLUTIONS</p>
-        </div>
       </div>
 
       {/* Right side with form */}
-      <div className="flex flex-col justify-center w-1/2 p-8">
+      <div className="flex flex-col justify-center w-1/2 p-16">
         <h1 className="mb-8 text-3xl font-bold text-teal-500">
           {t.welcomeText}
         </h1>
@@ -114,7 +111,7 @@ const PatientLogin = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-96 px-4 py-3 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
               required
             />
           </div>
@@ -128,22 +125,22 @@ const PatientLogin = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-3 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-96 px-4 py-3 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
               required
             />
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-start">
             <button
               type="submit"
-              className="px-6 py-3 text-white transition duration-300 bg-teal-500 rounded-lg w-32 hover:bg-teal-600"
+              className="px-2  py-3 text-white transition duration-300 bg-teal-500 rounded-lg w-32 hover:bg-teal-600"
             >
               {t.login}
             </button>
           </div>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-6 justify-start">
           <span className="text-gray-600">{t.signupPrompt}</span>{" "}
           <Link to="/psignup" className="ml-1 font-medium text-teal-600">
             {t.signup}

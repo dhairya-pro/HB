@@ -42,7 +42,7 @@ const UploadMedicalReports = ({ patientId, condition }) => {
             <button 
                 onClick={handleUpload} 
                 disabled={uploading}
-                className="mt-2 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md"
+                className="mt-2 bg-teal-500  text-white py-2 px-4 rounded-md"
             >
                 {uploading ? "Uploading..." : "Upload"}
             </button>

@@ -12,6 +12,7 @@
         "dsignup",
         "getdoctors",
         "Patientdashboard",
+        "patientemail",
         "Patientlogin",
         "patientname",
         "patientroutes",

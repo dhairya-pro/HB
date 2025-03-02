@@ -1,6 +1,6 @@
 
 import Appointment from '../models/appoinment.model.js'
-import Doctor from '../models/doctor.model.js'
+import Doctor from '../models/doctor.model.js';
 import Patient from '../models/patient.model.js'
 import { sendEmail } from '../services/email.services.js'
 
@@ -9,6 +9,36 @@ export const addappointment = async (req, res) => {
     try {
         const { patientId, patientname, doctorname, doctorId, date, time, status } = req.body;
 
+    
+        const existingAppointment = await Appointment.findOne({ doctorId, date, time });
+
+        if (existingAppointment) {
+            return res.status(400).json({ message: "This time slot is already booked. Please select another time slot." });
+        }
+
+    
+        const newPatient = await Patient.findOne({ patientId });
+        if (!newPatient) {
+            console.log("❌ Error: Patient details not found.");
+            return res.status(404).json({ message: "Patient not found" });
+        }
+        const patientEmail = newPatient.email;
+
+        if (!patientEmail) {
+            console.log("⚠️ Warning: Patient email not found.");
+        }
+
+        const newDoctor = await Doctor.findOne({ doctorId });
+        if (!newDoctor) {
+            console.log("❌ Error: Doctor details not found.");
+            return res.status(404).json({ message: "Doctor not found" });
+        }
+        const doctorEmail = newDoctor.email;
+
+        if (!doctorEmail) {
+            console.log("⚠️ Warning: Doctor email not found.");
+        }
+
         const appointment = new Appointment({
             patientId,
             patientname,
@@ -16,28 +46,16 @@ export const addappointment = async (req, res) => {
             doctorId,
             date,
             time,
-            status
+            status,
+            patientEmail,  
+            doctorEmail,   
         });
 
-        if (!appointment) {
-            console.log("Error in adding appointment");
-            return res.status(400).json({ message: "Failed to add appointment" });
-        }
+        await appointment.save();
 
-        await appointment.save(); // Wait for the appointment to be saved
-
-        // Fixing the Patient query
-        const patient = await Patient.findOne({ patientId });
-
-        if (!patient) {
-            console.log("Error in finding email of patient");
-            return res.status(404).json({ message: "Patient not found" });
-        }
-
-        const email = patient.email;
 
         await sendEmail(
-            email,
+            patientEmail,
             "Thanks for booking your slot",
             `Your slot has been successfully booked on ${date} at ${time}!`
         );
@@ -45,10 +63,12 @@ export const addappointment = async (req, res) => {
         return res.status(201).json({ message: "Appointment added and email sent successfully" });
 
     } catch (error) {
-        console.error(error);
+        console.error("🔥 Error:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 };
+
+
 
 
 export const getAppointmentsByPatientId = async (req, res) => {

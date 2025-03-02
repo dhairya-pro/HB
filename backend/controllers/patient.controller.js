@@ -4,19 +4,25 @@ import axios from 'axios'; // Import Axios
 import BloodDonate from '../models/bloodrequest.model.js';
 import fs from "fs";
 import FormData from "form-data";
+import vision from "@google-cloud/vision";
 import { SpeechClient } from "@google-cloud/speech";
-import Groq from "groq-sdk"; // Import Groq SDK
+import Groq from "groq-sdk"; 
+import path from 'path';
+
 const speechClient = new SpeechClient({
-    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS, // Google Cloud Key
+    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS, 
   });
   const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY, // Set your Groq API key in .env
+    apiKey: process.env.GROQ_API_KEY, 
   });
-  
+
+
+  const client = new vision.ImageAnnotatorClient({
+    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS, 
+  });
 
 
 
-// ✅ Patient Signup Controller
 export const patientSignup = async (req, res) => {
     try {
         const { name, age, gender, contact, email, password } = req.body;
@@ -75,7 +81,6 @@ export const patientSignup = async (req, res) => {
     }
 };
 
-// ✅ Patient Login Controller
 export const patientLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -451,3 +456,60 @@ Respond in a professional medical tone using the requested language.`;
         res.status(500).json({ reply: "Error fetching AI response" });
     }
 };
+
+
+
+export const visionanalyze = async (req,res) =>{
+    try {
+        if (!req.file) return res.status(400).json({ error: "No image provided" });
+
+        const filePath = path.resolve(req.file.path);
+        console.log("Saved file path:", filePath); // Debugging
+
+        if (!fs.existsSync(filePath)) {
+            return res.status(400).json({ error: "Image file not found" });
+        }
+
+        // Read image as Buffer
+        const imageBuffer = fs.readFileSync(filePath);
+        console.log("Image Buffer Length:", imageBuffer.length); // Debugging
+
+        // Send image to Google Vision API
+        const [result] = await client.faceDetection({ image: { content: imageBuffer.toString("base64") } });
+        console.log("API Response:", result);
+
+        // Delete the file after processing
+        fs.unlinkSync(filePath);
+
+        if (!result.faceAnnotations || result.faceAnnotations.length === 0) {
+            return res.json({ message: "No face detected." });
+        }
+
+        // Extract emotions
+        const face = result.faceAnnotations[0];
+        const emotions = {
+            joy: face.joyLikelihood,
+            sorrow: face.sorrowLikelihood,
+            anger: face.angerLikelihood,
+            surprise: face.surpriseLikelihood,
+            underExposed: face.underExposedLikelihood,
+            blurred: face.blurredLikelihood,
+            headTilt: face.tiltAngle,
+        };
+
+        // Generate health recommendations
+        let healthRecommendations = [];
+        if (face.underExposedLikelihood === "VERY_LIKELY") {
+            healthRecommendations.push("Possible anemia or dehydration detected. Consider a checkup.");
+        }
+        if (face.joyLikelihood === "VERY_UNLIKELY") {
+            healthRecommendations.push("Signs of stress or fatigue detected. Take some rest.");
+        }
+
+        res.json({ analysis: emotions, healthRecommendations });
+
+    } catch (error) {
+        console.error("Error analyzing image:", error);
+        res.status(500).json({ error: "Image processing failed. Ensure Vision API is set up correctly." });
+    }
+}

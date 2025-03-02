@@ -112,12 +112,12 @@ const DocumentAnalyzer = () => {
                     <option value="gu">Gujarati</option>
                 </select>
 
-                <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded-lg">
+                <button type="submit" className="w-full bg-teal-500 text-white py-2 rounded-lg">
                     Analyze Document
                 </button>
             </form>
 
-            {result && (
+            {/* {result && (
                 <div className="mt-6 p-4 bg-gray-100 rounded-lg">
                     <h3 className="font-semibold">Analysis Result:</h3>
                     <ul className="list-disc pl-5">
@@ -128,14 +128,37 @@ const DocumentAnalyzer = () => {
                         ))}
                     </ul>
                 </div>
-            )}
+            )} */}
 
-            {MedicalResponse && (
-                <div className="mt-6 p-4 bg-blue-100 rounded-lg">
-                    <h3 className="font-semibold">Medical Insights ({language.toUpperCase()}):</h3>
-                    <p className="text-sm">{MedicalResponse}</p>
-                </div>
-            )}
+{MedicalResponse && (
+    <div className="mt-6 p-4 bg-blue-100 rounded-lg">
+        <h3 className="font-semibold mb-2">Medical Insights ({language.toUpperCase()}):</h3>
+        <div className="text-sm">
+            {MedicalResponse.split("\n").map((line, index) => {
+                // Remove unintended numbering
+                const cleanedLine = line.replace(/^\d+\.\s*/, "");
+
+                // If the line contains bold markdown-style text, wrap it in <strong>
+                if (cleanedLine.includes("**")) {
+                    return (
+                        <p key={index} className="mt-1">
+                            <span dangerouslySetInnerHTML={{ __html: cleanedLine.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} />
+                        </p>
+                    );
+                }
+
+                // If it's a numbered point (not bold), render it as a list item
+                return cleanedLine.match(/^\d+\./) ? (
+                    <li key={index} className="ml-5 list-decimal">{cleanedLine}</li>
+                ) : (
+                    <p key={index} className="mt-1">{cleanedLine}</p>
+                );
+            })}
+        </div>
+    </div>
+)}
+
+
         </div>
     );
 };

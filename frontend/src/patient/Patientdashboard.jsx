@@ -12,8 +12,47 @@ import DocumentAnalyzer from "../components/DocumentAnalyzer.jsx";
 import Voicebasedassistant from "../components/Voicebasedassistant.jsx";
 import AshaAI from "../components/AshaAi.jsx";
 import {useLanguage } from "../../LanguageContext.jsx";
+// eslint-disable-next-line no-unused-vars
 import { FaUser, FaCalendarAlt, FaHospital, FaFileMedical, FaHeartbeat, FaSignOutAlt, FaMicrophone, FaFileAlt } from "react-icons/fa";
-const Profile = () => <div className="p-6"><h2 className="text-2xl font-bold mb-4">Profile</h2><p>Your profile information will appear here.</p></div>;
+
+
+const Profile = () => {
+  const [showProfile, setShowProfile] = useState(false);
+
+  const patientData = {
+    name: "Dhairya Shah",
+    age: 30,
+    gender: "Male",
+    appointmentStatus: "Completed",
+  }
+
+  ;
+
+  return (
+    <div className="p-6">
+      <button
+        onClick={() => setShowProfile(true)}
+        className="bg-teal-500 text-white px-4 py-2 rounded-md hover:bg-teal-600"
+      >
+        View Profile
+      </button>
+
+      {showProfile && (
+        <div className="mt-4 p-4 border border-gray-300 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold mb-2">Patient Profile</h2>
+          <p><strong>Name:</strong> {patientData.name}</p>
+          <p><strong>Age:</strong> {patientData.age}</p>
+          <p><strong>Gender:</strong> {patientData.gender}</p>
+          <p className="text-green-600 font-semibold">
+            <strong>Appointment Status:</strong> {patientData.appointmentStatus}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+
 
 
 const translations = {
@@ -208,19 +247,14 @@ const Appointments = () => {
 };
 
 
-
-
-
-
-
-
-
-
 const PatientDashboard = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("appointments");
-
+  
+  const handleBack = () => {
+    navigate('/homepage');
+  };
   if (!user) {
     console.error("User not found in context");
     navigate("/plogin");
@@ -235,8 +269,7 @@ const PatientDashboard = () => {
     { id: "bloodbank", label: "Blood Banks", icon: <FaHeartbeat /> },
     { id: "NeedBlood", label: "Need Blood", icon: <FaHeartbeat /> },
     { id: "DocumentAnalyser", label: "Document Analyzer", icon: <FaFileAlt /> },
-    { id: "VoiceAssistant", label: "Voice Assistant", icon: <FaMicrophone /> },
-    { id: "AshaAI", label: "AshaAI", icon: <FaMicrophone /> },
+   
   ];
 
   const renderComponent = () => {
@@ -257,7 +290,14 @@ const PatientDashboard = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
+
       <aside className="w-64 bg-[#D1E5E4] text-black flex flex-col p-6 space-y-4 shadow-lg">
+      <button 
+          onClick={handleBack} 
+          className="absolute top-2 left-8 flex items-center text-gray-500 hover:text-teal-600"
+        >
+          <span>← back</span>
+        </button>
         <h1 className="text-2xl font-bold">Patient Portal</h1>
         <p className="text-sm opacity-80">Welcome, {user.patient.name}</p>
         <nav className="flex-grow space-y-2">

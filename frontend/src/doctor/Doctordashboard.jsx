@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaUserMd, FaCalendarAlt, FaClipboardList, FaUser } from "react-icons/fa";
+import { FaUserMd, FaCalendarAlt, FaClipboardList, FaUser, FaVideo } from "react-icons/fa";
 import { useAuth } from "../components/AuthContext.jsx";
 import { axiosInstance } from "../axiosinstance.js";
 
@@ -45,7 +45,7 @@ const DoctorDashboard = () => {
     const { name, value } = e.target;
     setPrescription(prev => ({ ...prev, [name]: value }));
   };
-
+  
   const submitPrescription = async () => {
     try {
       await axiosInstance.post("/doctor/savePrescription", {
@@ -55,11 +55,9 @@ const DoctorDashboard = () => {
         notes: prescription.notes,
       });
 
-      // Move the appointment to completed
       setAppointments(prev => prev.filter(appt => appt.appointmentId !== selectedAppointment.appointmentId));
       setCompletedAppointments(prev => [...prev, { ...selectedAppointment, status: "Completed" }]);
 
-      // Reset state
       setShowPrescriptionForm(false);
       setSelectedAppointment(null);
       setPrescription({ medicines: "", notes: "" });
@@ -68,9 +66,19 @@ const DoctorDashboard = () => {
     }
   };
 
+  const scheduleMeeting = async (appointmentId) => {
+    try {
+        const response = await axiosInstance.post("/doctor/Schedule-meeting", { appointmentId });
+
+        alert(`Google Meet Link: ${response.data.meetLink}`);
+    } catch (error) {
+        console.error("Error scheduling meeting", error);
+    }
+};
+
+
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
       <div className="w-1/5 bg-teal-600 text-white p-5 flex flex-col">
         <div className="flex items-center space-x-2 mb-6">
           <FaUserMd size={30} />
@@ -91,28 +99,7 @@ const DoctorDashboard = () => {
         </nav>
       </div>
 
-      {/* Main Content */}
       <div className="w-4/5 p-6">
-        {activeTab === "dashboard" && (
-          <>
-            <h1 className="text-3xl font-bold text-gray-700">Dashboard</h1>
-            <h2 className="text-2xl font-semibold mt-6">Completed Appointments</h2>
-            <div className="grid grid-cols-2 gap-4 mt-4">
-              {completedAppointments.length > 0 ? (
-                completedAppointments.map(appt => (
-                  <div key={appt.appointmentId} className="bg-gray-200 p-4 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold">Patient: {appt.patientname}</h3>
-                    <p className="text-sm text-gray-500">Time: {appt.time}</p>
-                    <p className="text-sm text-gray-500">Status: Completed</p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500">No completed appointments</p>
-              )}
-            </div>
-          </>
-        )}
-
         {activeTab === "appointments" && (
           <>
             <h2 className="text-2xl font-semibold">Upcoming Appointments</h2>
@@ -129,6 +116,12 @@ const DoctorDashboard = () => {
                     >
                       Mark as Completed & Add Prescription
                     </button>
+                    <button
+                      onClick={() => scheduleMeeting(appt.appointmentId)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded mt-2 ml-2 flex items-center"
+                    >
+                      <FaVideo className="mr-1" /> Schedule Meeting
+                    </button>
                   </div>
                 ))
               ) : (
@@ -136,34 +129,6 @@ const DoctorDashboard = () => {
               )}
             </div>
           </>
-        )}
-
-        {/* Prescription Form Modal */}
-        {showPrescriptionForm && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg w-1/3">
-              <h2 className="text-xl font-bold mb-4">Add Prescription</h2>
-              <p className="text-sm mb-2"><strong>Patient:</strong> {selectedAppointment.patientname}</p>
-              <textarea
-                name="medicines"
-                placeholder="Enter prescribed medicines..."
-                className="w-full p-2 border rounded mb-2"
-                value={prescription.medicines}
-                onChange={handlePrescriptionChange}
-              ></textarea>
-              <textarea
-                name="notes"
-                placeholder="Additional notes..."
-                className="w-full p-2 border rounded mb-2"
-                value={prescription.notes}
-                onChange={handlePrescriptionChange}
-              ></textarea>
-              <div className="flex justify-end space-x-2">
-                <button onClick={() => setShowPrescriptionForm(false)} className="bg-gray-500 text-white px-3 py-1 rounded">Cancel</button>
-                <button onClick={submitPrescription} className="bg-blue-500 text-white px-3 py-1 rounded">Submit</button>
-              </div>
-            </div>
-          </div>
         )}
       </div>
     </div>

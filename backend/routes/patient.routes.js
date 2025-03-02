@@ -23,4 +23,5 @@ router.get("/get-blood",verifyToken,patientController.getBloodRequests)
 router.post("/speech-to-text",verifyToken,upload.single("audio"),patientController.speechToText)
 router.post("/process-text",verifyToken,patientController.processText)
 router.post("/medical-response",verifyToken,patientController.medicalresponse)
+router.post('/vision-analyze',verifyToken,upload.single("image"),patientController.visionanalyze)
 export default router;

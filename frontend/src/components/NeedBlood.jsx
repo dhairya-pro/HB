@@ -125,7 +125,7 @@ const NeedBlood = () => {
                     ))}
                 </select>
 
-                <button type="submit" className="w-full bg-red-500 text-white py-2 rounded-lg">
+                <button type="submit" className="w-full bg-teal-500 text-white py-2 rounded-lg">
                     Submit Request
                 </button>
             </form>

@@ -10,6 +10,10 @@ const appointmentSchema = new mongoose.Schema({
     date: { type: Date, required: true },
     time: { type: String, required: true }, // Example: "10:30 AM"
     status: { type: String, enum: ["Scheduled", "Completed", "Cancelled"], default: "Scheduled" },
+    meetLink : {type : String},
+    patientEmail : {type :String},
+    doctorEmail: {type : String},
+
 
 });
 

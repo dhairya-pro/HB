@@ -5,15 +5,12 @@ import { getDoctorDashboard } from '../controllers/doctor.controller.js';
 import * as appointment from '../controllers/appointment.controller.js'
 const router = express.Router();
 
-// ✅ Doctor Signup Route
 router.post('/signup', doctorController.doctorSignup);
-
-
-// ✅ Doctor Login Route
 router.post('/login', doctorController.doctorLogin);
 router.get("/dashboard", verifyToken, doctorOnly, getDoctorDashboard);
 router.get("/getdoctors",verifyToken, doctorController.getDoctors);
 router.get("/getappointments",verifyToken, appointment.getAppointmentsbydoctorid);
 router.put("/updateStatus",verifyToken, appointment.updateStatus);
 router.post("/savePrescription",verifyToken,doctorController.Prescriptionadd)
+router.post("/Schedule-meeting",verifyToken,doctorController.meetingScheduler)
 export default router;

@@ -1,5 +1,4 @@
 import React, { useState, useRef } from "react";
-import axios from "axios";
 import { axiosInstance } from "../axiosinstance";
 import { FaMicrophone, FaStop } from "react-icons/fa";
 import { Card, CardContent, Typography, Button, Box, CircularProgress } from "@mui/material";

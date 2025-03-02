@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { axiosInstance } from '../axiosinstance';
 import { useLanguage } from '../../LanguageContext';
 
+
 const Patientsignup = () => {
   const { language } = useLanguage();
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ const Patientsignup = () => {
   const translations = {
     en: {
       title: "Patient Registration",
+      back: "← Back",
       name: "Full Name",
       age: "Age",
       gender: "Gender",
@@ -87,6 +89,7 @@ const Patientsignup = () => {
         apiError: "નેટવર્ક ભૂલ. મહેરબાની કરીને થોડીવાર પછી ફરીથી પ્રયાસ કરો."
       }
     }
+
   };
 
   const t = translations[language] || translations.en;
@@ -104,7 +107,9 @@ const Patientsignup = () => {
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const handleBack = () =>{
+    navigate('/')
+   }
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -131,54 +136,60 @@ const Patientsignup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
-    <div className="w-full max-w-3xl px-8">
-      <h1 className="text-3xl font-medium text-teal-500 mb-6">{t.title}</h1>
-
-      {successMessage && <p className="text-green-700 bg-green-100 p-3 rounded mt-2">{successMessage}</p>}
-      {errors.apiError && <p className="text-red-500 text-sm mt-1">{errors.apiError}</p>}
-
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-          {["name", "contact", "email", "password", "confirmPassword"].map((field) => (
-            <div key={field}>
-              <label className="block text-gray-700 text-lg font-medium mb-2">{t[field]}</label>
-              <input
-                type={field.includes("password") ? "password" : "text"}
-                name={field}
-                value={formData[field]}
-                onChange={handleChange}
-                className="w-full p-3 bg-gray-100 rounded-md"
-              />
-              {errors[field] && <p className="text-red-500 text-sm mt-1">{errors[field]}</p>}
-            </div>
-          ))}
-
-          <div>
-            <label className="block text-gray-700 text-lg font-medium mb-2">{t.age}</label>
-            <input type="number" name="age" value={formData.age} onChange={handleChange} className="w-full p-3 bg-gray-100 rounded-md" />
-            {errors.age && <p className="text-red-500 text-sm mt-1">{errors.age}</p>}
-          </div>
-
-          <div>
-            <label className="block text-gray-700 text-lg font-medium mb-2">{t.gender}</label>
-            <select name="gender" value={formData.gender} onChange={handleChange} className="w-full p-3 bg-gray-100 rounded-md">
-              <option value="">{t.gender}</option>
-              <option value="Male">{t.male}</option>
-              <option value="Female">{t.female}</option>
-              <option value="Other">{t.other}</option>
-            </select>
-            {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender}</p>}
-          </div>
-        </div>
-
-        <button type="submit" className="px-8 py-3 mt-8 text-white bg-teal-500 rounded-md hover:bg-teal-600">
-          {isSubmitting ? t.creatingAccount : t.signUp}
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
+    <button 
+          onClick={handleBack} 
+          className="absolute top-8 left-8 flex items-center text-gray-500 hover:text-teal-600"
+        >
+          <span> {t.back}</span>
         </button>
-      </form>
-      <button onClick={() => navigate('/plogin')} className="mt-4 text-teal-600 underline">{t.haveAccount}</button>
+      <div className="w-full max-w-3xl px-8">
+        <h1 className="text-3xl font-medium text-teal-500 mb-6 text-center">{t.title}</h1>
+
+        {successMessage && <p className="text-green-700 bg-green-100 p-3 rounded mt-2">{successMessage}</p>}
+        {errors.apiError && <p className="text-red-500 text-sm mt-1">{errors.apiError}</p>}
+
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            {["name", "contact", "email", "password", "confirmPassword"].map((field) => (
+              <div key={field}>
+                <label className="block text-gray-700 text-lg font-medium mb-2">{t[field]}</label>
+                <input
+                  type={field.includes("password") ? "password" : "text"}
+                  name={field}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  className="w-full p-3 bg-gray-100 rounded-md"
+                />
+                {errors[field] && <p className="text-red-500 text-sm mt-1">{errors[field]}</p>}
+              </div>
+            ))}
+
+            <div>
+              <label className="block text-gray-700 text-lg font-medium mb-2">{t.age}</label>
+              <input type="number" name="age" value={formData.age} onChange={handleChange} className="w-full p-3 bg-gray-100 rounded-md" />
+              {errors.age && <p className="text-red-500 text-sm mt-1">{errors.age}</p>}
+            </div>
+
+            <div>
+              <label className="block text-gray-700 text-lg font-medium mb-2">{t.gender}</label>
+              <select name="gender" value={formData.gender} onChange={handleChange} className="w-full p-3 bg-gray-100 rounded-md">
+                <option value="">{t.gender}</option>
+                <option value="Male">{t.male}</option>
+                <option value="Female">{t.female}</option>
+                <option value="Other">{t.other}</option>
+              </select>
+              {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender}</p>}
+            </div>
+          </div>
+
+          <button type="submit" className="px-8 py-3 mt-8 text-white bg-teal-500 rounded-md hover:bg-teal-600">
+            {isSubmitting ? t.creatingAccount : t.signUp}
+          </button>
+        </form>
+        <button onClick={() => navigate('/plogin')} className="mt-4 text-teal-600 underline">{t.haveAccount}</button>
+      </div>
     </div>
-  </div>
   );
 };
 
